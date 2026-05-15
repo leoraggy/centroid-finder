@@ -26,6 +26,12 @@
             <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- The core JavaCV API -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv-platform</artifactId>
+            <version>1.5.13</version> 
+        </dependency>
     </dependencies>
 
     <build>
@@ -46,7 +52,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>io.github.leoraggy.centroidFinder.ImageSummaryApp</mainClass>
+                            <mainClass>io.github.leoraggy.centroifinder.ImageSummaryApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

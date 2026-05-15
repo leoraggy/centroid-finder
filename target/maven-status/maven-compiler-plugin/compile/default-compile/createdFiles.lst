@@ -1,5 +1,6 @@
 io\github\leoraggy\centroidfinder\BinaryGroupFinder.class
 io\github\leoraggy\centroidfinder\ImageGroupFinder.class
+io\github\leoraggy\centroidfinder\JavaCVPlayground.class
 io\github\leoraggy\centroidfinder\Coordinate.class
 io\github\leoraggy\centroidfinder\DistanceImageBinarizer.class
 io\github\leoraggy\centroidfinder\EuclideanColorDistance.class
