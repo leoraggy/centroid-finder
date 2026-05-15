@@ -27,11 +27,13 @@
             <scope>test</scope>
         </dependency>
         <!-- The core JavaCV API -->
-        <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>javacv-platform</artifactId>
-            <version>1.5.13</version> 
-        </dependency>
+<!-- Source: https://mvnrepository.com/artifact/org.bytedeco/javacv -->
+    <dependency>
+        <groupId>org.bytedeco</groupId>
+        <artifactId>javacv</artifactId>
+        <version>1.5.13</version>
+        <scope>compile</scope>
+    </dependency>
     </dependencies>
 
     <build>
