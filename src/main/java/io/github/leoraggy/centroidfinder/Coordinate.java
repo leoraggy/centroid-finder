@@ -1,3 +1,4 @@
+package io.github.leoraggy.centroidfinder;
 /**
  * Represents a location in an image or array
  * 

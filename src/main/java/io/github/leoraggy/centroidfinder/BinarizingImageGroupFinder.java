@@ -1,3 +1,4 @@
+package io.github.leoraggy.centroidfinder;
 import java.awt.image.BufferedImage;
 import java.util.List;
 

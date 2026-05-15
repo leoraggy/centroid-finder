@@ -1,3 +1,4 @@
+package io.github.leoraggy.centroidfinder;
 /**
  * Represents a group of contiguous pixels in an image.
  * The top-left cell of the array (row:0, column:0) is considered to be coordinate (x:0, y:0).
@@ -17,6 +18,7 @@
 public record Group(int size, Coordinate centroid) implements Comparable<Group> {
 
     /**
+     * 
      * Compares this group with the specified group for order.
      * The comparison is based on the group's size first, then the x coordinate of the centroid,
      * and finally on the y coordinate of the centroid.

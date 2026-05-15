@@ -1,3 +1,4 @@
+package io.github.leoraggy.centroidfinder;
 import java.util.List;
 
 public interface BinaryGroupFinder {
