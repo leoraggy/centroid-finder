@@ -26,14 +26,14 @@
             <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
-        <!-- The core JavaCV API -->
-<!-- Source: https://mvnrepository.com/artifact/org.bytedeco/javacv -->
-    <dependency>
-        <groupId>org.bytedeco</groupId>
-        <artifactId>javacv</artifactId>
-        <version>1.5.13</version>
-        <scope>compile</scope>
-    </dependency>
+        <!-- The core JavaCV Platform API -->
+        <!-- Source: https://mvnrepository.com/artifact/org.bytedeco/javacv-platform -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv-platform</artifactId>
+            <version>1.5.13</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -43,7 +43,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <mainClass>io.github.leoraggy.centroidfinder.ImageSummaryApp</mainClass>
+                    <mainClass>io.github.leoraggy.centroidfinder.VideoExperiment</mainClass>
                 </configuration>
             </plugin>
             <plugin>
