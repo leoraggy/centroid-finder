@@ -2,54 +2,114 @@ package io.github.leoraggy.centroidfinder;
 
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.OpenCVFrameConverter;
-import org.bytedeco.opencv.global.opencv_imgcodecs;
-import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.javacv.Java2DFrameConverter;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.List;
+import javax.imageio.ImageIO;
+
+/**
+ * The Video Summary Application (Tracking Largest Centroid Only).
+ */
 public class VideoSummaryApp {
     public static void main(String[] args) {
 
+     org.bytedeco.javacv.FFmpegLogCallback.setLevel(org.bytedeco.ffmpeg.global.avutil.AV_LOG_ERROR);
         String videoPath = "sampleInput/ensantina.mp4";
+        String hexTargetColor = "48010c";
+        int threshold = 30;
 
-        try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoPath)) {
+        // Parse hex color into a 24-bit integer
+        int targetColor = 0;
+        try {
+            targetColor = Integer.parseInt(hexTargetColor, 16);
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid hex target color. Please use RRGGBB format.");
+            return;
+        }
 
-            grabber.start();
+        // Initialize the core processing pipeline components
+        ColorDistanceFinder distanceFinder = new EuclideanColorDistance();
+        ImageBinarizer binarizer = new DistanceImageBinarizer(distanceFinder, targetColor, threshold);
+        ImageGroupFinder groupFinder = new BinarizingImageGroupFinder(binarizer, new DfsBinaryGroupFinder());
 
-            OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
-            Frame frame;
-            int frameNumber = 0;
+        // Create the output directories if they don't exist
+        File outputDir = new File("sampleOutput");
+        if (!outputDir.exists()) {
+            outputDir.mkdirs();
+        }
 
-            while ((frame = grabber.grabImage()) != null) {
-                Mat mat = converter.convert(frame);
-                System.out.println("Read frame: " + frameNumber);
+        String csvOutputPath = "sampleOutput/video_summary.csv";
 
-                if (frameNumber > 0 && frameNumber % 60 == 0) {
+        // Open the CSV file for appending data across all frames
+        try (PrintWriter csvWriter = new PrintWriter(new FileWriter(csvOutputPath, false))) {
+            // Write a CSV Header to keep the data organized
+            csvWriter.println("group_size,centroid_x,centroid_y");
+
+            System.out.println("Opening video stream: " + videoPath);
+            try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoPath)) {
+                grabber.start();
+
+                Java2DFrameConverter converter = new Java2DFrameConverter();
+                Frame frame;
+                int frameNumber = 0;
+
+                // Loop through the video frame-by-frame
+                while ((frame = grabber.grabImage()) != null) {
                     
-                    String outputPath = "sampleOutput/frame_" + frameNumber + ".jpg";
-                    
-                    opencv_imgcodecs.imwrite(outputPath, mat);
-                    System.out.println("Saved frame " + frameNumber + " for processing.");
+                    // Process exactly every 60 frames
+                    if (frameNumber % 60 == 0) {
 
-                    String[] nextAppArgs = { outputPath, String.valueOf(frameNumber) };
+                        // Convert JavaCV Frame to standard Java BufferedImage
+                        BufferedImage inputImage = converter.convert(frame);
 
-                    YourOtherClassName.main(nextAppArgs); 
+                        if (inputImage != null) {
+                            // 1. Replicate Binarization Engine
+                            int[][] binaryArray = binarizer.toBinaryArray(inputImage);
+                            BufferedImage binaryImage = binarizer.toBufferedImage(binaryArray);
+
+                            // Save binarized visual frame to disk
+                            String binarizedFramePath = "sampleOutput/binarized_frame_" + frameNumber + ".png";
+                            ImageIO.write(binaryImage, "png", new File(binarizedFramePath));
+
+                         // 2. Replicate Connected-Component Logic (DFS Group Finding)
+                            List<Group> groups = groupFinder.findConnectedGroups(inputImage);
+
+                            // --- NEW FILTER LOGIC: Find the single largest group using the record's size() method ---
+                            Group largestGroup = null;
+
+                            for (Group group : groups) {
+                                // Calling the auto-generated record method group.size()
+                                if (largestGroup == null || group.size() > largestGroup.size()) {
+                                    largestGroup = group;
+                                }
+                            }
+                            // 3. Write only the single largest group's data to the CSV file
+                            if (largestGroup != null) {
+                                csvWriter.println(largestGroup.toCsvRow());
+                            }
+                            
+                            csvWriter.flush(); // Push data straight to disk
+                        }
+                    }
+
+                    frameNumber++;
                 }
 
-                if (frameNumber == 0) {
-                    opencv_imgcodecs.imwrite("sampleOutput/firstFrame.jpg", mat);
-                    System.out.println("Saved first frame!");
-                }
+                grabber.stop();
+                System.out.println("\nVideo analysis complete!");
+                System.out.println("Master spreadsheet saved to: " + csvOutputPath);
 
-                frameNumber++;
-
-                if (frameNumber >= 200) { 
-                    break;
-                }
+            } catch (Exception e) {
+                System.err.println("Error decoding video layers.");
+                e.printStackTrace();
             }
 
-            grabber.stop();
-
         } catch (Exception e) {
+            System.err.println("Could not initialize master CSV writer stream.");
             e.printStackTrace();
         }
     }
