@@ -1,0 +1,14 @@
+io\github\leoraggy\centroidfinder\ImageGroupFinder.class
+io\github\leoraggy\centroidfinder\JavaCVPlayground.class
+io\github\leoraggy\centroidfinder\EuclideanColorDistance.class
+io\github\leoraggy\centroidfinder\Group.class
+io\github\leoraggy\centroidfinder\VideoExperiment.class
+io\github\leoraggy\centroidfinder\ImageSummaryApp.class
+io\github\leoraggy\centroidfinder\ColorDistanceFinder.class
+io\github\leoraggy\centroidfinder\BinaryGroupFinder.class
+io\github\leoraggy\centroidfinder\VideoSummaryApp.class
+io\github\leoraggy\centroidfinder\Coordinate.class
+io\github\leoraggy\centroidfinder\DistanceImageBinarizer.class
+io\github\leoraggy\centroidfinder\BinarizingImageGroupFinder.class
+io\github\leoraggy\centroidfinder\DfsBinaryGroupFinder.class
+io\github\leoraggy\centroidfinder\ImageBinarizer.class

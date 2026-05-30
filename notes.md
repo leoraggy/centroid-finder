@@ -6,3 +6,4 @@
 4.  Write the binarized image to disk as "binarized.png"
 5.  Create an ImageGroupFinder using a BinarizingImageGroupFinder with a DFS-based BinaryGroupFinder
 
+PUSHING VIDEO BRANCH
