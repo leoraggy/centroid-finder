@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.List;
+
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
@@ -83,17 +84,7 @@ public class VideoSummaryApp {
                         BufferedImage inputImage = converter.convert(frame);
 
                         if (inputImage != null) {
-                            // 1. Binarization Engine
-                            int[][] binaryArray = binarizer.toBinaryArray(inputImage);
-                            BufferedImage binaryImage = binarizer.toBufferedImage(binaryArray);
-
-                            // Save binarized visual frame adjacent to output CSV folder path
-                            // if (parentDir != null) {
-                            //     String binarizedFramePath = parentDir.getAbsolutePath() + File.separator + "binarized_frame_" + frameNumber + ".png";
-                            //     ImageIO.write(binaryImage, "png", new File(binarizedFramePath));
-                            // }
-
-                            // 2. Connected-Component Logic (DFS Group Finding)
+                            // 1. Connected-Component Logic (DFS Group Finding)
                             List<Group> groups = groupFinder.findConnectedGroups(inputImage);
 
                             // Find the single largest group using the record's size() method
@@ -104,7 +95,7 @@ public class VideoSummaryApp {
                                 }
                             }
 
-                            // 3. Write only the single largest group's data to the CSV file
+                            // 2. Write only the single largest group's data to the CSV file
                             if (largestGroup != null) {
                                 csvWriter.println(largestGroup.toCsvRow());
                             }
