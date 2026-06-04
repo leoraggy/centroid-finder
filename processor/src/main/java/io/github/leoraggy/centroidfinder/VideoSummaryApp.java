@@ -27,12 +27,21 @@ public class VideoSummaryApp {
         String hexTargetColor = args[2];
         int threshold;
 
+        File videoFile = new File(videoPath);
+        if (!videoFile.exists() || !videoFile.isFile()) {
+            System.err.println("Error: Input video file does not exist or is invalid: " + videoPath);
+            System.exit(1);
+        }
+
         try {
             threshold = Integer.parseInt(args[3]);
+            if (threshold < 0 || threshold > 441) {
+                System.err.println("Error: Threshold must be an integer between 0 and 441.");
+                System.exit(1);
+            }
         } catch (NumberFormatException e) {
-            System.err.println("Invalid threshold value. Must be a valid integer string.");
+            System.err.println("Error: Invalid threshold value. Must be a valid integer string.");
             System.exit(1);
-            return;
         }
 
         // Parse hex color into a 24-bit integer
@@ -58,6 +67,10 @@ public class VideoSummaryApp {
         File parentDir = csvFile.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
             parentDir.mkdirs();
+        }
+
+        if (csvFile.exists() && csvFile.isFile()) {
+            System.out.println("Warning: Output CSV file already exists. Overwriting: " + csvOutputPath);
         }
 
         // Open the CSV file for appending data across all frames
