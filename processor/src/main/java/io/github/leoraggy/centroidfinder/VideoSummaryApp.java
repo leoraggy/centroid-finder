@@ -5,12 +5,30 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.List;
+
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 
 /**
- * The Video Summary Application (Accepting dynamic runtime arguments).
+ * Code Overview: VideoSummaryApp
+VideoSummaryApp is a command-line computer vision utility that tracks a specific color throughout a video file and logs its movement to a CSV file.
+
+How It Works:
+1. Parses Inputs: Accepts 4 runtime arguments: input video path, output CSV path, target hex color (e.g., FF0000), and a color variance threshold.
+2. Frames Sampling: Opens the video using JavaCV/FFmpeg and decodes exactly 1 out of every 60 frames to optimize performance.
+3. Binarization: Uses a 3D Euclidean formula to calculate how close each pixel's color is to the target. Pixels within the threshold become 1 (active); others become 0 (background).
+4. Object Detection: Runs a Depth-First Search (DFS) grouping algorithm to clump adjacent active pixels into shapes.
+5. Data Export: Identifies the single largest group in the frame and writes its size and center coordinates (centroid_x, centroid_y) as a new row in the output CSV.
+
+Quick Facts:
+Coordinate System: Standard graphics space where (0,0) is the top-left corner.
+
+Fail-Safe: Flushes the CSV writer on every frame to prevent data loss if the process is interrupted.
+
+Exit Codes: Returns 0 on success, 1 on invalid arguments or rendering errors.
+
+Usage: java -jar processor.jar <videoPath> <csvOutputPath> <hexTargetColor> <threshold>
  */
 public class VideoSummaryApp {
     public static void main(String[] args) {
@@ -96,17 +114,7 @@ public class VideoSummaryApp {
                         BufferedImage inputImage = converter.convert(frame);
 
                         if (inputImage != null) {
-                            // 1. Binarization Engine
-                            int[][] binaryArray = binarizer.toBinaryArray(inputImage);
-                            BufferedImage binaryImage = binarizer.toBufferedImage(binaryArray);
-
-                            // Save binarized visual frame adjacent to output CSV folder path
-                            // if (parentDir != null) {
-                            //     String binarizedFramePath = parentDir.getAbsolutePath() + File.separator + "binarized_frame_" + frameNumber + ".png";
-                            //     ImageIO.write(binaryImage, "png", new File(binarizedFramePath));
-                            // }
-
-                            // 2. Connected-Component Logic (DFS Group Finding)
+                            // 1. Connected-Component Logic (DFS Group Finding)
                             List<Group> groups = groupFinder.findConnectedGroups(inputImage);
 
                             // Find the single largest group using the record's size() method
@@ -117,7 +125,7 @@ public class VideoSummaryApp {
                                 }
                             }
 
-                            // 3. Write only the single largest group's data to the CSV file
+                            // 2. Write only the single largest group's data to the CSV file
                             if (largestGroup != null) {
                                 csvWriter.println(largestGroup.toCsvRow());
                             }
