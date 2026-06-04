@@ -133,4 +133,101 @@ public class DfsBinaryGroupFinderTest {
             assertTrue(prev.compareTo(curr) >= 0);
         }
     }
+
+    @Test
+    public void allZerosMatrix() {
+        int[][] image = {
+            {0, 0, 0},
+            {0, 0, 0}
+        };
+
+        DfsBinaryGroupFinder test = new DfsBinaryGroupFinder();
+        List<Group> actual = test.findConnectedGroups(image);
+
+        assertTrue("An all-zero matrix should return no groups", actual.isEmpty());
+    }
+
+    // -----------------------------
+    // Test 8: Minimalist 1x1 Boundaries
+    // -----------------------------
+    @Test
+    public void singlePixelMatrix() {
+        DfsBinaryGroupFinder test = new DfsBinaryGroupFinder();
+
+        // Case A: Single zero pixel
+        List<Group> actualZero = test.findConnectedGroups(new int[][]{{0}});
+        assertTrue(actualZero.isEmpty());
+
+        // Case B: Single one pixel
+        List<Group> actualOne = test.findConnectedGroups(new int[][]{{1}});
+        assertEquals(1, actualOne.size());
+        assertEquals(1, actualOne.get(0).size());
+    }
+
+    // -----------------------------
+    // Test 9: Hollow Ring / Donut Shape (Centroid Validation)
+    // -----------------------------
+    @Test
+    public void donutShapeGroup() {
+        int[][] image = {
+            {1, 1, 1},
+            {1, 0, 1},
+            {1, 1, 1}
+        };
+
+        DfsBinaryGroupFinder test = new DfsBinaryGroupFinder();
+        List<Group> actual = test.findConnectedGroups(image);
+
+        assertEquals(1, actual.size());
+        Group g = actual.get(0);
+        assertEquals(8, g.size());
+        
+        // Centroid should mathematically resolve to the middle pixel (1, 1)
+        // even though the middle pixel itself is a 0.
+        assertEquals(1, g.centroid().x());
+        assertEquals(1, g.centroid().y());
+    }
+
+    // -----------------------------
+    // Test 10: Diagonal Connectivity Check
+    // -----------------------------
+    @Test
+    public void diagonalTouchConnectivity() {
+        int[][] image = {
+            {1, 0},
+            {0, 1}
+        };
+
+        DfsBinaryGroupFinder test = new DfsBinaryGroupFinder();
+        List<Group> actual = test.findConnectedGroups(image);
+
+        // NOTE: Adjust this assertion based on your business logic!
+        // If your algorithm uses 4-connectivity, size should be 2.
+        // If your algorithm uses 8-connectivity, size should be 1.
+        int expectedGroups = 2; 
+        
+        assertEquals("Verify if 4-connectivity or 8-connectivity is correctly implemented", 
+                     expectedGroups, actual.size());
+    }
+
+    // -----------------------------
+    // Test 11: Complex Serpent / Winding Path
+    // -----------------------------
+    @Test
+    public void snakePath() {
+        int[][] image = {
+            {1, 1, 1, 0},
+            {0, 0, 1, 0},
+            {0, 1, 1, 0},
+            {0, 1, 0, 0},
+            {0, 1, 1, 1}
+        };
+
+        DfsBinaryGroupFinder test = new DfsBinaryGroupFinder();
+        List<Group> actual = test.findConnectedGroups(image);
+
+        assertEquals(1, actual.size());
+        assertEquals(10, actual.get(0).size());
+    }
+}
 }
