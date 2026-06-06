@@ -8,6 +8,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -170,4 +173,45 @@ public class VideoProcessingController {
                     .body(Map.of("error", "Error fetching job status"));
         }
     }
-}
+
+    @GetMapping("/process/{jobId}/download")
+    public ResponseEntity<?> downloadJobResult(@PathVariable String jobId) {
+        try {
+            JobStatusResponse currentStatus = jobTracker.get(jobId);
+
+            if (currentStatus == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Job ID not found."));
+            }
+
+            if (!"done".equals(currentStatus.getStatus())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Job is not completed yet. Current status: " + currentStatus.getStatus()));
+            }
+
+            String csvPath = currentStatus.getResult();
+            if (csvPath == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "Output path not recorded for this job."));
+            }
+
+            File file = new File(csvPath);
+            if (!file.exists()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "The generated file could not be found on the server."));
+            }
+
+            Resource resource = new FileSystemResource(file);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                    .contentType(MediaType.parseMediaType("text/csv"))
+                    .body(resource);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error provisioning file download: " + e.getMessage()));
+        }
+    }
+    }
+
