@@ -1,5 +1,3 @@
-Kevin Goals:
-
 Easy:
 
 - Make Thumbnails for each Video in the Videos Page.

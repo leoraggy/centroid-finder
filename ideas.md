@@ -1,5 +1,3 @@
-Kevin:
-
 Ideas:
 
 1. Get the most common location the salamander stays at, divide it into its three sections to find the section it likes the most, then have the ability to filter videos by sections its stay at the most
