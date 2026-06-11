@@ -61,14 +61,7 @@ http://localhost:8080/api
 ---
 
 ## Configuration
-
-Add the following property to your `application.properties`:
-
-```properties
-video.mounting.directory=C:/videos
-```
-
-This directory should contain the MP4 files that will be processed.
+Your video files should be located in the root of the ```/server``` folder.
 
 ---
 
